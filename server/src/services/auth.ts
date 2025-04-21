@@ -37,3 +37,25 @@ export const signToken = (username: string, email: string, _id: unknown) => {
 
   return jwt.sign(payload, secretKey, { expiresIn: '1h' });
 };
+
+export const authMiddleware = ({ req }) => {
+  let token = req.body.token || req.query.token || req.headers.authorization;
+  
+  if (req.headers.authorization) {
+    token = token.split(' ').pop().trim();
+  }
+  
+  if (!token) {
+    return req;
+  }
+  
+  try {
+    const secretKey = process.env.JWT_SECRET_KEY || '';
+    const { data } = jwt.verify(token, secretKey);
+    req.user = data;
+  } catch {
+    console.log('Invalid token');
+  }
+  
+  return req;
+};
