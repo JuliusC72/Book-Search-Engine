@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
-    "@rollup/rollup-win32-x64-msvc": "^4.40.0",
     "@types/express": "^5.0.1",
     "apollo-server-express": "^3.13.0",
     "graphql": "^16.10.0"
