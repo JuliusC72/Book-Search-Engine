@@ -1,7 +1,6 @@
+import { AuthenticationError } from 'apollo-server-express';
 import User from '../models/User.js';
 import { signToken } from '../services/auth.js';
-import { AuthenticationError } from 'apollo-server-express';
-import type { UserDocument } from '../models/User.js';
 
 // Define context interface
 interface Context {
@@ -10,16 +9,6 @@ interface Context {
     username: string;
     email: string;
   };
-}
-
-// Define book input interface
-interface BookInput {
-  bookId: string;
-  authors: string[];
-  description: string;
-  title: string;
-  image?: string;
-  link?: string;
 }
 
 const resolvers = {
@@ -31,25 +20,32 @@ const resolvers = {
       throw new AuthenticationError('You need to be logged in!');
     },
   },
+
   Mutation: {
     addUser: async (_parent: unknown, { username, email, password }: { username: string; email: string; password: string }) => {
       const user = await User.create({ username, email, password });
       const token = signToken(user.username, user.email, user._id);
       return { token, user };
     },
+    
     login: async (_parent: unknown, { email, password }: { email: string; password: string }) => {
       const user = await User.findOne({ email });
+
       if (!user) {
         throw new AuthenticationError('No user found with this email address');
       }
+
       const correctPw = await user.isCorrectPassword(password);
+
       if (!correctPw) {
         throw new AuthenticationError('Incorrect credentials');
       }
+
       const token = signToken(user.username, user.email, user._id);
       return { token, user };
     },
-    saveBook: async (_parent: unknown, { bookData }: { bookData: BookInput }, context: Context) => {
+    
+    saveBook: async (_parent: unknown, { bookData }: { bookData: any }, context: Context) => {
       if (context.user) {
         return User.findOneAndUpdate(
           { _id: context.user._id },
@@ -59,6 +55,7 @@ const resolvers = {
       }
       throw new AuthenticationError('You need to be logged in!');
     },
+    
     removeBook: async (_parent: unknown, { bookId }: { bookId: string }, context: Context) => {
       if (context.user) {
         return User.findOneAndUpdate(

@@ -39,11 +39,20 @@ export const signToken = (username: string, email: string, _id: unknown) => {
 
   return jwt.sign({ data: payload }, secretKey, { expiresIn: '1h' });
 };
+interface JwtPayloadData {
+  _id: string;
+  username: string;
+  email: string;
+}
+
+interface JwtPayloadWithData {
+  data: JwtPayloadData;
+}
 
 export const authMiddleware = ({ req }: { req: Request }) => {
-  let token = req.body.token || req.query.token || req.headers.authorization;
+  let token = req.body?.token || req.query?.token || req.headers?.authorization;
   
-  if (req.headers.authorization) {
+  if (req.headers?.authorization) {
     token = token.split(' ').pop().trim();
   }
   
@@ -53,8 +62,8 @@ export const authMiddleware = ({ req }: { req: Request }) => {
   
   try {
     const secretKey = process.env.JWT_SECRET_KEY || '';
-    const { data } = jwt.verify(token, secretKey) as JwtPayload;
-    req.user = data;
+    const decoded = jwt.verify(token, secretKey) as JwtPayloadWithData;
+    req.user = decoded.data;
   } catch {
     console.log('Invalid token');
   }
