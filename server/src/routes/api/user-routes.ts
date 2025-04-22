@@ -11,13 +11,24 @@ import {
 // import middleware
 import { authenticateToken } from '../../services/auth.js';
 
-// put authMiddleware anywhere we need to send a token for verification of user
-router.route('/').post(createUser).put(authenticateToken, saveBook);
+router.route('/')
+  .post(async (req, res) => {
+    await createUser(req, res);
+  })
+  .put(authenticateToken, async (req, res) => {
+    await saveBook(req, res);
+  });
 
-router.route('/login').post(login);
+router.route('/login').post(async (req, res) => {
+  await login(req, res);
+});
 
-router.route('/me').get(authenticateToken, getSingleUser);
+router.route('/me').get(authenticateToken, async (req, res) => {
+  await getSingleUser(req, res);
+});
 
-router.route('/books/:bookId').delete(authenticateToken, deleteBook);
+router.route('/books/:bookId').delete(authenticateToken, async (req, res) => {
+  await deleteBook(req, res);
+});
 
 export default router;
