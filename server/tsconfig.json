@@ -3,6 +3,7 @@
   "compilerOptions": {
     /* Modules */
     "rootDir": "src" /* Specify the root folder within your source files. */,
+    "strictNullChecks": true /* Enable strict null checks. */,
 
     /* Emit */
     "outDir": "dist" /* Specify an output folder for all emitted files. */
