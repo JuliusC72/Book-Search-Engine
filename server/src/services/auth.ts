@@ -5,9 +5,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 interface JwtPayload {
-  _id: unknown;
-  username: string;
-  email: string,
+  data: {
+    _id: string;
+    username: string;
+    email: string;
+  }
 }
 
 export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
@@ -23,7 +25,7 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
         return res.sendStatus(403); // Forbidden
       }
 
-      req.user = user as JwtPayload;
+      req.user = (user as JwtPayload).data;
       return next();
     });
   } else {
@@ -35,10 +37,10 @@ export const signToken = (username: string, email: string, _id: unknown) => {
   const payload = { username, email, _id };
   const secretKey = process.env.JWT_SECRET_KEY || '';
 
-  return jwt.sign(payload, secretKey, { expiresIn: '1h' });
+  return jwt.sign({ data: payload }, secretKey, { expiresIn: '1h' });
 };
 
-export const authMiddleware = ({ req }) => {
+export const authMiddleware = ({ req }: { req: Request }) => {
   let token = req.body.token || req.query.token || req.headers.authorization;
   
   if (req.headers.authorization) {
@@ -51,7 +53,7 @@ export const authMiddleware = ({ req }) => {
   
   try {
     const secretKey = process.env.JWT_SECRET_KEY || '';
-    const { data } = jwt.verify(token, secretKey);
+    const { data } = jwt.verify(token, secretKey) as JwtPayload;
     req.user = data;
   } catch {
     console.log('Invalid token');

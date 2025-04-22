@@ -18,7 +18,7 @@ app.use(express.json());
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../../client/dist')));
   
-  app.get('*', (req, res) => {
+  app.get('*', (_req, res) => {
     res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
   });
 }
@@ -34,7 +34,7 @@ const startServer = async () => {
   // Start Apollo Server
   await server.start();
   
-  // Apply Apollo middleware
+  // Apply Apollo middleware and type assertion to fix the compatibility issue
   server.applyMiddleware({ app });
   
   db.once('open', () => {
