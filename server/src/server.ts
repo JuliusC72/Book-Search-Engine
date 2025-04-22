@@ -35,7 +35,7 @@ const startServer = async () => {
   await server.start();
   
   // Apply Apollo middleware and type assertion to fix the compatibility issue
-  server.applyMiddleware({ app });
+  server.applyMiddleware({ app: app as express.Application });
   
   db.once('open', () => {
     app.listen(PORT, () => {
